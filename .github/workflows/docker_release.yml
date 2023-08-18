@@ -59,7 +59,7 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          platforms: linux/amd64,linux/armhf,linux/arm64
+          platforms: linux/amd64,linux/armhf,linux/aarch64
           tags: |
             nwithan8/pixlet:latest
             nwithan8/pixlet:${{ steps.vars.outputs.version }}
