@@ -65,10 +65,10 @@ jobs:
           push: true
           platforms: linux/${{ matrix.arch }}
           tags: |
-            nwithan8/pixlet-${{ matrix.arch }}:latest
-            nwithan8/pixlet-${{ matrix.arch }}:${{ steps.vars.outputs.version }}
-            ghcr.io/nwithan8/pixlet-${{ matrix.arch }}:latest
-            ghcr.io/nwithan8/pixlet-${{ matrix.arch }}:${{ steps.vars.outputs.version }}
+            nwithan8/pixlet:latest-${{ matrix.arch }}
+            nwithan8/pixlet:${{ steps.vars.outputs.version }}-${{ matrix.arch }}
+            ghcr.io/nwithan8/pixlet:latest-${{ matrix.arch }}
+            ghcr.io/nwithan8/pixlet:${{ steps.vars.outputs.version }}-${{ matrix.arch }}
           labels: |
             org.opencontainers.image.title=pixlet
             org.opencontainers.image.version=${{ steps.vars.outputs.version }}
