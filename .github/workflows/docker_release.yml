@@ -15,14 +15,14 @@ on:
         required: true
 jobs:
   publish:
-    name: Build & Publish to DockerHub and GitHub Packages
+    name: Publish to DockerHub and GitHub Packages
     runs-on: ubuntu-latest
     if: contains(github.event.head_commit.message, '[no build]') == false
     strategy:
       fail-fast: false
       matrix:
         arch: ["amd64", "aarch64"]
-    steps:
+    steps: 
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -64,11 +64,14 @@ jobs:
           file: ./Dockerfile
           push: true
           platforms: linux/${{ matrix.arch }}
+          # Single repo on DockerHub, multi-repo on GitHub for HA addon compatibility
+          # pixlet-amd64:latest for GitHub
+          # pixlet:latest-amd64 for DockerHub
           tags: |
             nwithan8/pixlet:latest-${{ matrix.arch }}
             nwithan8/pixlet:${{ steps.vars.outputs.version }}-${{ matrix.arch }}
-            ghcr.io/nwithan8/pixlet:latest-${{ matrix.arch }}
-            ghcr.io/nwithan8/pixlet:${{ steps.vars.outputs.version }}-${{ matrix.arch }}
+            ghcr.io/nwithan8/pixlet-${{ matrix.arch }}:latest
+            ghcr.io/nwithan8/pixlet-${{ matrix.arch }}:${{ steps.vars.outputs.version }}
           labels: |
             org.opencontainers.image.title=pixlet
             org.opencontainers.image.version=${{ steps.vars.outputs.version }}
