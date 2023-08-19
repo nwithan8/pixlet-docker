@@ -1,21 +1,18 @@
 name: Build & Publish Docker image
 on:
-  release:
-    types: [ created ]
-    secrets:
-      DOCKER_USERNAME:
-        required: true
-      DOCKER_TOKEN:
-        required: true
   workflow_dispatch:
     inputs:
       version:
         type: string
-        description: Version number
+        description: Version
+        required: true
+      pixlet_version:
+        type: string
+        description: Pixlet version
         required: true
 jobs:
-  publish:
-    name: Publish to DockerHub and GitHub Packages
+  publish_webapp:
+    name: Publish Pixlet WebApp
     runs-on: ubuntu-latest
     if: contains(github.event.head_commit.message, '[no build]') == false
     strategy:
@@ -31,10 +28,13 @@ jobs:
       - name: Establish variables
         id: vars
         run: |
-          VERSION=${{ github.event.inputs.version || github.ref_name }}
+          VERSION=${{ github.event.inputs.version }}
           echo ::set-output name=version::${VERSION}
+          PIXLET_VERSION=${{ github.event.inputs.pixlet_version }}
+          echo ::set-output name=pixlet_version::${PIXLET_VERSION}
           echo ::set-output name=today::$(date +'%Y-%m-%d')
           echo "::set-output name=year::$(date +'%Y')"
+          echo "::set-output name=app_name::pixlet"
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
@@ -61,18 +61,86 @@ jobs:
         with:
           builder: ${{ steps.docker-buildx.outputs.name }}
           context: .
-          file: ./Dockerfile
+          build_args: "PIXLET_VERSION: ${{ steps.vars.outputs.pixlet_version }}"
+          file: ./webapp/standard/Dockerfile
           push: true
           platforms: linux/${{ matrix.arch }}
           # Single repo on DockerHub, multi-repo on GitHub for HA addon compatibility
           # pixlet-amd64:latest for GitHub
           # pixlet:latest-amd64 for DockerHub
           tags: |
-            nwithan8/pixlet:latest-${{ matrix.arch }}
-            nwithan8/pixlet:${{ steps.vars.outputs.version }}-${{ matrix.arch }}
-            ghcr.io/nwithan8/pixlet-${{ matrix.arch }}:latest
-            ghcr.io/nwithan8/pixlet-${{ matrix.arch }}:${{ steps.vars.outputs.version }}
+            nwithan8/${{ steps.vars.outputs.app_name }}:latest-${{ matrix.arch }}
+            nwithan8/${{ steps.vars.outputs.app_name }}:${{ steps.vars.outputs.version }}-${{ matrix.arch }}
+            ghcr.io/nwithan8/${{ steps.vars.outputs.app_name }}-${{ matrix.arch }}:latest
+            ghcr.io/nwithan8/${{ steps.vars.outputs.app_name }}-${{ matrix.arch }}:${{ steps.vars.outputs.version }}
           labels: |
-            org.opencontainers.image.title=pixlet
+            org.opencontainers.image.title=${{ steps.vars.outputs.app_name }}
+            org.opencontainers.image.version=${{ steps.vars.outputs.version }}
+            org.opencontainers.image.created=${{ steps.vars.outputs.today }}
+
+  publish_push:
+    name: Publish Pixlet Push
+    runs-on: ubuntu-latest
+    if: contains(github.event.head_commit.message, '[no build]') == false
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: ["amd64", "aarch64"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Establish variables
+        id: vars
+        run: |
+          VERSION=${{ github.event.inputs.version }}
+          echo ::set-output name=version::${VERSION}
+          PIXLET_VERSION=${{ github.event.inputs.pixlet_version }}
+          echo ::set-output name=pixlet_version::${PIXLET_VERSION}
+          echo ::set-output name=today::$(date +'%Y-%m-%d')
+          echo "::set-output name=year::$(date +'%Y')"
+          echo "::set-output name=app_name::pixlet-push"
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+        id: docker-buildx
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          builder: ${{ steps.docker-buildx.outputs.name }}
+          context: .
+          build_args: "PIXLET_VERSION: ${{ steps.vars.outputs.pixlet_version }}"
+          file: ./push/standard/Dockerfile
+          push: true
+          platforms: linux/${{ matrix.arch }}
+          # Single repo on DockerHub, multi-repo on GitHub for HA addon compatibility
+          # pixlet-push-amd64:latest for GitHub
+          # pixlet-push:latest-amd64 for DockerHub
+          tags: |
+            nwithan8/${{ steps.vars.outputs.app_name }}:latest-${{ matrix.arch }}
+            nwithan8/${{ steps.vars.outputs.app_name }}:${{ steps.vars.outputs.version }}-${{ matrix.arch }}
+            ghcr.io/nwithan8/${{ steps.vars.outputs.app_name }}-${{ matrix.arch }}:latest
+            ghcr.io/nwithan8/${{ steps.vars.outputs.app_name }}-${{ matrix.arch }}:${{ steps.vars.outputs.version }}
+          labels: |
+            org.opencontainers.image.title=${{ steps.vars.outputs.app_name }}
             org.opencontainers.image.version=${{ steps.vars.outputs.version }}
             org.opencontainers.image.created=${{ steps.vars.outputs.today }}
