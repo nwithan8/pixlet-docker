@@ -5,7 +5,7 @@ from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-PIXLET_BINARY = "pixlet"
+PIXLET_BINARY = "/pixlet/pixlet"
 TEMP_STORAGE = "/tmp/flask"
 RENDER_FILE_NAME = f"{TEMP_STORAGE}/rendered.webp"
 
