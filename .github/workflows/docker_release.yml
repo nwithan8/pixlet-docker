@@ -61,7 +61,7 @@ jobs:
         with:
           builder: ${{ steps.docker-buildx.outputs.name }}
           context: .
-          build_args: "PIXLET_VERSION: ${{ steps.vars.outputs.pixlet_version }}"
+          build_args: "PIXLET_VERSION=${{ steps.vars.outputs.pixlet_version }}"
           file: ./webapp/standard/Dockerfile
           push: true
           platforms: linux/${{ matrix.arch }}
@@ -128,7 +128,7 @@ jobs:
         with:
           builder: ${{ steps.docker-buildx.outputs.name }}
           context: .
-          build_args: "PIXLET_VERSION: ${{ steps.vars.outputs.pixlet_version }}"
+          build_args: "PIXLET_VERSION=${{ steps.vars.outputs.pixlet_version }}"
           file: ./push/standard/Dockerfile
           push: true
           platforms: linux/${{ matrix.arch }}
