@@ -6,8 +6,7 @@ from flask import Flask, request, jsonify
 app = Flask(__name__)
 
 PIXLET_BINARY = "pixlet"
-# TEMP_STORAGE = "/tmp/flask"
-TEMP_STORAGE = "/Users/nharris/code/personal/pixlet-docker/tmp/flask"
+TEMP_STORAGE = "/tmp/flask"
 RENDER_FILE_NAME = f"{TEMP_STORAGE}/rendered.webp"
 
 

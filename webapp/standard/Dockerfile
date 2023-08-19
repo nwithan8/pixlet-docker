@@ -25,7 +25,8 @@ RUN echo "" >> /root/.bashrc
 RUN echo "export PATH=$PATH:/pixlet" >> /root/.bashrc
 
 # Copy example files into container
-COPY /hello_world.star /root/
+# Files stored in hassio directory because HA needs them to be in the same directory as the Dockerfile
+COPY /webapp/hassio/hello_world.star /root/
 
 # Install pixlet binary
 RUN mkdir /pixlet

@@ -27,8 +27,8 @@ RUN echo "export PATH=$PATH:/pixlet" >> /root/.bashrc
 RUN echo "export PIXLET_FILES_DIR=/config/addons_config/pixlet" >> /root/.bashrc
 
 # Copy Python server files into container
-COPY /push/server.py /server/
-COPY /push/requirements.txt /server/
+COPY /server.py /server/
+COPY /requirements.txt /server/
 RUN chmod a+x /server/server.py
 
 # Install pixlet binary

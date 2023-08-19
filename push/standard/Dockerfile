@@ -25,8 +25,9 @@ RUN echo "" >> /root/.bashrc
 RUN echo "export PATH=$PATH:/pixlet" >> /root/.bashrc
 
 # Copy Python server files into container
-COPY /push/server.py /server/
-COPY /push/requirements.txt /server/
+# Files stored in hassio directory because HA needs them to be in the same directory as the Dockerfile
+COPY /push/hassio/server.py /server/
+COPY /push/hassio/requirements.txt /server/
 RUN chmod a+x /server/server.py
 
 # Install pixlet binary
