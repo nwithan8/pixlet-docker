@@ -1,21 +1,20 @@
-name: Pixlet
+name: Pixlet Push
 version: 0.28.0
-slug: pixlet
-description: Build apps for pixel-based displays, such as Tidbyt
+slug: pixlet_push
+description: Send Pixlet images to a Tidbyt device
 url: https://github.com/hassio-addons/addon-pixlet
 codenotary: nwithan8@users.noreply.github.com
-webui: http://[HOST]:[PORT:8080]
+webui: http://[HOST]:[PORT:5000]
 startup: services
 init: false
 arch:
   - amd64
   - aarch64
-map:
-  - config:rw
+map: []
 ports:
-  8080/tcp: 9142
+  5000/tcp: 5300
 ports_description:
-  8080/tcp: Web UI
+  5000/tcp: Web Server
 hassio_api: false
 backup_exclude: []
 options: {}

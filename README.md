@@ -111,7 +111,7 @@ Add the following to your `configuration.yaml`:
 
 ``` yaml
 shell_command:
-  tidbyt_display: 'curl -X POST -F "device_id=<TIDBYT_DEVICE_ID>" -F "api_key=<TIDBYT_API_KEY>" -F "file=@/config/addons_config/pixlet/{{ file }}.star" http://localhost:5000/push
+  tidbyt_display: 'curl -X POST -F "device_id=<TIDBYT_DEVICE_ID>" -F "api_key=<TIDBYT_API_KEY>" -F "file=@/config/pixlet_files/{{ file }}.star" http://localhost:5000/push
 ```
 
 Then, you can call the service from an automation:
@@ -122,7 +122,4 @@ data:
   file: coffee
 ```
 
-The above example will push the `coffee.star` file in your `config/addons_config/pixlet` folder to your Tidbyt device.
-
-- The container automatically creates the `config/addons_config/pixlet` folder when it starts up, so it's recommended to
-  use this folder to store your `.star` files.
+The above example will push the `coffee.star` file to your Tidbyt device.
